@@ -12,37 +12,50 @@ public class JogoDaForca {
 	public static void obterDados() {
 
 		Scanner in = new Scanner (System.in);
-		String [] palavras = {"ABACAXI", "UNIVERSIDADE", "PALAVRA", "COMIDA","PROFISSAO", "AMIGO", "CAVALEIRO"};
+		String [] palavras = { "ABACAXI", "UNIVERSIDADE", "PALAVRA", "COMIDA", "PROFISSAO", "AMIGO", "CAVALEIRO"};
 		String sorteada = random(palavras);
 		char [] acertos = new char[sorteada.length()];
 		int erro = 0;
 		int feliz = 0;
 		int qtd = 0;
-		imprimir(sorteada);
-		imprimir("\n");
+		char [] usadas = new char [sorteada.length()];
+		
 		char letra = ' ';
 		String desenho = " ";
-
+		imprimir("=====Bem-Vindo(a) ao Jogo Da Forca!=====\n"); 
+		desenho = bonequinho(erro);
+		imprimir(desenho);
+		
+		imprimir("\n");
+		
 		while ( feliz < sorteada.length() && erro < 6) {
 			// Resolvemos a maior parte dos problemas, o único que consegui identificar no momento é que o programa tá contando como acerto
 			// mesmo que a pessoa digite a mesma letra várias vezes.
 
-
 			letra= jogada(in);
-			qtd = validar(letra,sorteada,acertos);
+			qtd = validar(letra,sorteada,acertos,usadas);
 			if(qtd == 0) {
 				erro++;
 				desenho = bonequinho(erro);
-				System.out.println("Errou");
 				imprimir(desenho);
-			} else {
+				estrategia(sorteada,acertos);
+			} else if (qtd == -1) {
+				imprimir("\nPalavra já digitada! Tente novamente...  :\n");
+				desenho = bonequinho(erro);
+				imprimir(desenho);
+				estrategia(sorteada,acertos);
+			}
+			else {
 					feliz += qtd;
-					System.out.println("Acertou");
+					desenho = bonequinho(erro);
+					imprimir(desenho);
+					estrategia(sorteada,acertos);
 				}
 			}
-			estrategia(sorteada,acertos);
+			
+		ganhouPerdeu(sorteada,feliz);
 		
-		System.out.println("Acabou!");
+		
 		in.close();
 	}
 
@@ -62,14 +75,19 @@ public class JogoDaForca {
 		return letra;
 	}
 
-	public static int validar(char letra, String sorteada, char [] acertos) {
+	public static int validar(char letra, String sorteada, char [] acertos, char [] usadas) {
 
 		int placar = 0;
 		for (int i = 0; i < sorteada.length(); i++) {
 			if (letra == sorteada.charAt(i)) {
+				if(letra != usadas[i]) {
 				acertos[i] = 1;
+				usadas[i] += letra;
+				}else {
+					placar = -1;
+					return placar;
+				}
 				placar += 1;
-				
 			}
 		}
 		return placar;
@@ -88,8 +106,12 @@ public class JogoDaForca {
 		return acertos;
 	}
 
-	public static void ganhouPerdeu () {
-
+	public static void ganhouPerdeu (String sorteada, int feliz) {
+		if ( feliz == sorteada.length()) {
+			imprimir("\nParabéns, Você é um vencedor!!!");
+		} else {
+			imprimir("\nQue pena, não foi dessa vez...");
+		}
 	}
 
 	public static void imprimir(char [] vect) {
